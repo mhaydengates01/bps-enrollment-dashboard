@@ -50,10 +50,6 @@ lerna-debug.log*
 Thumbs.db
 Desktop.ini
 
-# Testing
-coverage/
-.nyc_output/
-
 # Supabase local development
 .supabase/
 
@@ -64,6 +60,9 @@ n8n/database.sqlite
 # Local documentation (private instructions)
 CLAUDE.local.md
 *.local.md
+
+# Local Claude Code prompt documentation
+prompts/
 
 # Temporary files
 *.tmp
