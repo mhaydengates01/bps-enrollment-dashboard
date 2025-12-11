@@ -1,0 +1,152 @@
+erDiagram
+    %% ============================================================================
+    %% BPS ENROLLMENT DASHBOARD - ENTITY RELATIONSHIP DIAGRAM
+    %% Star Schema: 1 Dimension Table + 6 Fact Tables
+    %% ============================================================================
+
+    %% DIMENSION TABLE
+    schools {
+        TEXT school_id PK "ORG_CODE from DESE"
+        TEXT school_name "Organization name"
+        TEXT district_code "DIST_CODE"
+        TEXT district_name "District name"
+        TEXT org_type "School, District, or State"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    %% FACT TABLE - ENROLLMENT & DEMOGRAPHICS
+    enrollment {
+        BIGSERIAL id PK
+        INTEGER school_year "Year (e.g., 2025)"
+        TEXT school_id FK "References schools"
+        INTEGER total_enrollment "Total student count"
+        INTEGER pk_count "Pre-K enrollment"
+        INTEGER k_count "Kindergarten"
+        INTEGER grade_1_count "Grade 1"
+        INTEGER grade_2_count "Grade 2"
+        INTEGER grade_3_count "Grade 3"
+        INTEGER grade_4_count "Grade 4"
+        INTEGER grade_5_count "Grade 5"
+        INTEGER grade_6_count "Grade 6"
+        INTEGER grade_7_count "Grade 7"
+        INTEGER grade_8_count "Grade 8"
+        INTEGER grade_9_count "Grade 9"
+        INTEGER grade_10_count "Grade 10"
+        INTEGER grade_11_count "Grade 11"
+        INTEGER grade_12_count "Grade 12"
+        INTEGER sp_count "Special program"
+        DECIMAL american_indian_pct "Race percentages"
+        DECIMAL asian_pct
+        DECIMAL black_african_american_pct
+        DECIMAL hispanic_latino_pct
+        DECIMAL multi_race_non_hisp_pct
+        DECIMAL native_hawaiian_pacific_pct
+        DECIMAL white_pct
+        DECIMAL female_pct "Gender percentages"
+        DECIMAL male_pct
+        DECIMAL non_binary_pct
+        INTEGER english_learner_count "Selected populations"
+        DECIMAL english_learner_pct
+        INTEGER former_english_learner_count
+        DECIMAL former_english_learner_pct
+        INTEGER high_needs_count
+        DECIMAL high_needs_pct
+        INTEGER low_income_count
+        DECIMAL low_income_pct
+        INTEGER economically_disadvantaged_count
+        DECIMAL economically_disadvantaged_pct
+        INTEGER students_with_disabilities_count
+        DECIMAL students_with_disabilities_pct
+        TIMESTAMPTZ created_at
+    }
+
+    %% FACT TABLE - MCAS ACADEMIC PERFORMANCE
+    mcas_results {
+        BIGSERIAL id PK
+        INTEGER school_year
+        TEXT school_id FK "References schools"
+        TEXT test_grade "Grade level tested"
+        TEXT subject_code "ELA, MTH, SCI"
+        TEXT student_group "Demographics"
+        INTEGER meeting_exceeding_count "M+E count"
+        DECIMAL meeting_exceeding_pct
+        INTEGER exceeding_count "E count"
+        DECIMAL exceeding_pct
+        INTEGER meeting_count "M count"
+        DECIMAL meeting_pct
+        INTEGER partially_meeting_count "PM count"
+        DECIMAL partially_meeting_pct
+        INTEGER not_meeting_count "NM count"
+        DECIMAL not_meeting_pct
+        INTEGER student_count
+        DECIMAL student_participation_pct
+        DECIMAL avg_scaled_score
+        DECIMAL avg_student_growth_percentile
+        DECIMAL avg_sgp_included
+        INTEGER achievement_percentile
+        TIMESTAMPTZ created_at
+    }
+
+    %% FACT TABLE - ATTENDANCE
+    attendance {
+        BIGSERIAL id PK
+        INTEGER school_year
+        TEXT school_id FK "References schools"
+        TEXT student_group "Demographics"
+        DECIMAL attendance_rate_pct
+        DECIMAL chronic_absence_rate_pct "Missing 10%+ of school days"
+        INTEGER chronic_absence_count
+        INTEGER total_students
+        TIMESTAMPTZ created_at
+    }
+
+    %% FACT TABLE - GRADUATION RATES
+    graduation_rates {
+        BIGSERIAL id PK
+        INTEGER school_year
+        TEXT school_id FK "References schools"
+        TEXT graduation_cohort "Cohort identifier"
+        TEXT student_group "Demographics"
+        DECIMAL four_year_grad_rate_pct "4-year rate"
+        DECIMAL five_year_grad_rate_pct "5-year rate"
+        DECIMAL six_year_grad_rate_pct "6-year rate"
+        INTEGER total_cohort_students
+        INTEGER four_year_grad_count
+        INTEGER five_year_grad_count
+        INTEGER six_year_grad_count
+        TIMESTAMPTZ created_at
+    }
+
+    %% FACT TABLE - DISTRICT EXPENDITURES
+    expenditures {
+        BIGSERIAL id PK
+        INTEGER school_year
+        TEXT district_code "References schools.district_code"
+        TEXT district_name
+        TEXT indicator_category "Spending category"
+        TEXT indicator_subcategory "Spending subcategory"
+        DECIMAL indicator_value "Amount or count"
+        TEXT indicator_value_type "Count, Dollars, Percent, Ratio"
+        TIMESTAMPTZ created_at
+    }
+
+    %% FACT TABLE - DISTRICT ACCOUNTABILITY
+    accountability {
+        BIGSERIAL id PK
+        INTEGER school_year
+        TEXT district_code "References schools.district_code"
+        TEXT district_name
+        TEXT overall_classification "Requiring assistance or not"
+        TEXT reason_for_classification "Reason category"
+        DECIMAL progress_toward_targets_pct "Progress percentage"
+        TIMESTAMPTZ created_at
+    }
+
+    %% RELATIONSHIPS
+    schools ||--o{ enrollment : "has enrollment data"
+    schools ||--o{ mcas_results : "has MCAS results"
+    schools ||--o{ attendance : "has attendance data"
+    schools ||--o{ graduation_rates : "has graduation data"
+    schools ||--o{ expenditures : "district has expenditures"
+    schools ||--o{ accountability : "district has accountability"
