@@ -1,0 +1,249 @@
+{
+  "name": "MCAS API to Supabase",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://educationtocareer.data.mass.gov/resource/i9w6-niyt.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$limit",
+              "value": "1000"
+            },
+            {
+              "name": "$offset",
+              "value": "={{ $pageCount * 1000 }}"
+            },
+            {
+              "name": "$where",
+              "value": "sy >= '2021' AND sy <= '2025' AND dist_code='00350000'"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "paginationMode": "updateAParameterInEachRequest",
+            "paginationCompleteWhen": "other",
+            "completeExpression": "={{ $response.body.length < 1000 }}",
+            "limitPagesFetched": false
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "name": "Fetch MCAS Data (Paginated)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "school_year",
+              "name": "school_year",
+              "value": "={{ parseInt($json.sy) }}",
+              "type": "number"
+            },
+            {
+              "id": "school_id",
+              "name": "school_id",
+              "value": "={{ $json.org_code }}",
+              "type": "string"
+            },
+            {
+              "id": "test_grade",
+              "name": "test_grade",
+              "value": "={{ $json.test_grade }}",
+              "type": "string"
+            },
+            {
+              "id": "subject_code",
+              "name": "subject_code",
+              "value": "={{ $json.subject_code }}",
+              "type": "string"
+            },
+            {
+              "id": "student_group",
+              "name": "student_group",
+              "value": "={{ $json.stu_grp }}",
+              "type": "string"
+            },
+            {
+              "id": "meeting_exceeding_count",
+              "name": "meeting_exceeding_count",
+              "value": "={{ $json.m_plus_e_cnt ? parseInt($json.m_plus_e_cnt.replace(/,/g, '')) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "meeting_exceeding_pct",
+              "name": "meeting_exceeding_pct",
+              "value": "={{ $json.m_plus_e_pct ? parseFloat($json.m_plus_e_pct) * 100 : null }}",
+              "type": "number"
+            },
+            {
+              "id": "exceeding_count",
+              "name": "exceeding_count",
+              "value": "={{ $json.e_cnt ? parseInt($json.e_cnt.replace(/,/g, '')) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "exceeding_pct",
+              "name": "exceeding_pct",
+              "value": "={{ $json.e_pct ? parseFloat($json.e_pct) * 100 : null }}",
+              "type": "number"
+            },
+            {
+              "id": "meeting_count",
+              "name": "meeting_count",
+              "value": "={{ $json.m_cnt ? parseInt($json.m_cnt.replace(/,/g, '')) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "meeting_pct",
+              "name": "meeting_pct",
+              "value": "={{ $json.m_pct ? parseFloat($json.m_pct) * 100 : null }}",
+              "type": "number"
+            },
+            {
+              "id": "partially_meeting_count",
+              "name": "partially_meeting_count",
+              "value": "={{ $json.pm_cnt ? parseInt($json.pm_cnt.replace(/,/g, '')) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "partially_meeting_pct",
+              "name": "partially_meeting_pct",
+              "value": "={{ $json.pm_pct ? parseFloat($json.pm_pct) * 100 : null }}",
+              "type": "number"
+            },
+            {
+              "id": "not_meeting_count",
+              "name": "not_meeting_count",
+              "value": "={{ $json.nm_cnt ? parseInt($json.nm_cnt.replace(/,/g, '')) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "not_meeting_pct",
+              "name": "not_meeting_pct",
+              "value": "={{ $json.nm_pct ? parseFloat($json.nm_pct) * 100 : null }}",
+              "type": "number"
+            },
+            {
+              "id": "student_count",
+              "name": "student_count",
+              "value": "={{ $json.stu_cnt ? parseInt($json.stu_cnt.replace(/,/g, '')) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "student_participation_pct",
+              "name": "student_participation_pct",
+              "value": "={{ $json.stu_part_pct ? parseFloat($json.stu_part_pct) * 100 : null }}",
+              "type": "number"
+            },
+            {
+              "id": "avg_scaled_score",
+              "name": "avg_scaled_score",
+              "value": "={{ $json.avg_scaled_score ? parseFloat($json.avg_scaled_score) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "avg_student_growth_percentile",
+              "name": "avg_student_growth_percentile",
+              "value": "={{ $json.avg_sgp ? parseFloat($json.avg_sgp) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "avg_sgp_included",
+              "name": "avg_sgp_included",
+              "value": "={{ $json.avg_sgp_incl ? parseFloat($json.avg_sgp_incl) : null }}",
+              "type": "number"
+            },
+            {
+              "id": "achievement_percentile",
+              "name": "achievement_percentile",
+              "value": "={{ $json.ach_percentile && $json.ach_percentile !== 'N' ? parseInt($json.ach_percentile) : null }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Transform API Fields to Database Schema",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "tableId": "mcas_results",
+        "options": {
+          "onConflict": "school_id,school_year,test_grade,subject_code,student_group"
+        }
+      },
+      "name": "Insert to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "2",
+          "name": "Supabase API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Fetch MCAS Data (Paginated)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch MCAS Data (Paginated)": {
+      "main": [
+        [
+          {
+            "node": "Transform API Fields to Database Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform API Fields to Database Schema": {
+      "main": [
+        [
+          {
+            "node": "Insert to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
